@@ -1,12 +1,9 @@
-name: Windows
+name: Release
 
 on: 
   push:
     tags:
       - v*.*
-    branches:
-      - main
-
 jobs:
   build:
     runs-on: windows-latest
