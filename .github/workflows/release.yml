@@ -7,6 +7,7 @@ on:
 
 jobs:
   build_windows:
+    name: Call Windows workflow
     uses: ./.github/workflows/windows.yml
   release:
     name: Create release
