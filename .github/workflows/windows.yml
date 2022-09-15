@@ -1,6 +1,9 @@
 name: Windows
 
-on: [push, pull_request, workflow_dispatch, workflow_call]
+on: 
+  push:
+    tags-ignore:
+      -v*.*
 
 jobs:
   build:
@@ -15,7 +18,6 @@ jobs:
   release:
     name: Create release
     needs: [build]
-    if: ${{ github.github.ref_type == v** }}
     runs-on: windows-latest
     steps:
       - name: Create Release
