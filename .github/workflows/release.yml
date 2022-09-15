@@ -1,0 +1,35 @@
+name: Windows
+
+on: 
+  push:
+    tags:
+      - v*.*
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+       - name: Checkout repository
+         uses: actions/checkout@v3
+       - name: Generate visual Studio 2022 solution
+         run: cmake.exe --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -Btarget -G "Visual Studio 17 2022" -T host=x64 -A x64
+       - name: Build Google Test
+         run: cmake.exe --build target --config Release --target gtest
+  release:
+    name: Create release
+    needs: [build]
+    runs-on: windows-latest
+    steps:
+      - name: Create Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: |
+            This is the release content!
+          draft: true
+          prerelease: true
