@@ -6,11 +6,28 @@ on:
       - v[0-9]+.[0-9]+.[0-9]+
 jobs:
   build:
-    uses: ./.github/workflows/windows.yml
+    runs-on: windows-latest
+    steps:
+       - name: Checkout repository
+         uses: actions/checkout@v3
+       - name: Generate visual Studio 2022 solution
+         run: cmake.exe --no-warn-unused-cli -DCMAKE_EXPORT_COMPILE_COMMANDS:BOOL=TRUE -Btarget -G "Visual Studio 17 2022" -T host=x64 -A x64
+       - name: Build Google Test
+         run: cmake.exe --build target --config Release --target gtest
+       - name: 
+         run: | 
+            xcopy target\Windows_MSVC_AMD64\Release release\ /s /y
+            xcopy src\include\gtest release\gtest\ /s /y
+            7z.exe a -tzip Windows_MSVC_AMD64.zip .\release\*
+       - name: Cache release
+         uses: actions/cache@v3
+         with:
+           path: Windows_MSVC_AMD64.zip
+           key: Windows_MSVC_AMD64
   release:
     name: Create release
     needs: [build]
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Create Release
         uses: actions/create-release@v1
@@ -23,3 +40,19 @@ jobs:
             This is the release content!
           draft: true
           prerelease: true
+      - name: Retrieves windows release
+        uses: actions/cache@v3
+        with:
+          path: Windows_MSVC_AMD64.zip
+           key: Windows_MSVC_AMD64
+      - name: 
+      - name: Upload Release Asset
+        id: upload-release-asset 
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+          asset_path: ./Windows_MSVC_AMD64.zip
+          asset_name: Windows_MSVC_AMD64_test.zip
+          asset_content_type: application/zip
