@@ -16,7 +16,6 @@ jobs:
         run: | 
           xcopy target\Windows_MSVC_AMD64\Release release\ /s /y
           xcopy src\include\gtest release\gtest\ /s /y
-          7z.exe a -tzip Windows_MSVC_AMD64.zip .\release\*
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
