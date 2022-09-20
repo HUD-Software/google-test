@@ -14,7 +14,7 @@ jobs:
         run: cmake.exe --build target --config Release --target gtest
       - name: 
         run: | 
-          xcopy target\Windows_MSVC_AMD64\Release release\ /s /y
+          xcopy target\lib\Release release\ /s /y
           xcopy src\include\gtest release\gtest\ /s /y
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
